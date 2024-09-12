@@ -13,6 +13,7 @@ from selenium import webdriver
 import time
 import random
 
+from helpers import get_product_data
 from helpers.get_all_reviews import reviews_scrapping
 from helpers.get_urls_products import get_url_products
 
@@ -135,7 +136,7 @@ def rank_products_by_individual(sentiments, urls):
 
 
 
-@views.get("/api/opinions")
+@views.get("/api/opinions/{busqueda}")
 async def get_car_opinions(busqueda: str):
     urls: list[str] = get_url_products(busqueda)
 
@@ -144,7 +145,7 @@ async def get_car_opinions(busqueda: str):
     for url in urls:
         chrome_options = Options()
 
-        chrome_options.add_argument("--headless")
+        # chrome_options.add_argument("--headless")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
@@ -152,6 +153,7 @@ async def get_car_opinions(busqueda: str):
         driver = webdriver.Chrome(options=chrome_options)
         
         # Abrir la página del producto
+        print(url)
         driver.get(url)
         
         # Esperar a que la página cargue completamente
@@ -160,8 +162,9 @@ async def get_car_opinions(busqueda: str):
         # Borrar cookies del navegador para evitar ban
         driver.delete_all_cookies()
 
+        product = get_product_data(url)
+
         reviews = reviews_scrapping(driver)
-        # print(reviews)
 
         sentiments = analyze_sentiments(reviews)
         total_sentiments.append(sentiments)

@@ -1,7 +1,7 @@
-from models.recipe_model import Recipes
+from models.product_model import Product
 
 
-def fromModelToDict(recipe: Recipes):
+def fromModelToDict(recipe: Product):
     return {
         "title": recipe.title,
         "description": recipe.description,
@@ -10,7 +10,7 @@ def fromModelToDict(recipe: Recipes):
 
 
 def fromDictToModel(data: dict):
-    return Recipes(
+    return Product(
         title=data["title"],
         description=data["description"],
         ingredients=data["ingredients"],
