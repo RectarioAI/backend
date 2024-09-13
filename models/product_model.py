@@ -5,7 +5,9 @@ class Product(BaseModel):
     title: str
     image_url: str
     price: str
-    negative_reviews: int
-    positive_reviews: int
-    neutral_reviews: int
-    average_score: float
+    negative_reviews: int = 0
+    positive_reviews: int = 0
+    neutral_reviews: int = 0
+    average_score: float = 0.0
+
+    
