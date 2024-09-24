@@ -38,33 +38,6 @@ def remove_stopwords(text):
     filtered_words = [word for word in words if word.lower() not in stopwords_es]
     return ' '.join(filtered_words)
 
-def get_opinions_and_ratings(model, max_opinions=10):
-    url = f'https://www.opinautos.com/co/{model}/opiniones'
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    opinions = []
-    ratings = []
-    exclude_phrases = ['Lo mejor', 'Lo peor', 'Busca tu problema', 'Deja tu opinión', 'ModelXXXX', 'xxx']
-
-    for opinion_span in soup.find_all('span', class_='align-middle'):
-        cleaned_text = clean_text(opinion_span.get_text(strip=True))
-        if cleaned_text and len(opinions) < max_opinions and not any(phrase in cleaned_text for phrase in exclude_phrases):
-            opinions.append(cleaned_text)
-
-    for rating_box in soup.find_all('div', class_='LeftRightBox__left LeftRightBox__left--noshrink'):
-        stars = 0
-        for star_index in range(1, 6):
-            star_span = rating_box.find('span', {'data-starindex': str(star_index)})
-            if star_span and star_span.find('img', {'src': 'https://static.opinautos.com/images/design2/icons/icon_star--gold.svg?v=5eb58b'}):
-                stars += 1
-        ratings.append(stars)
-
-    if len(opinions) < max_opinions:
-        print(f'No se encontraron suficientes opiniones para {model}. Solo se encontraron {len(opinions)} opiniones.')
-
-    return opinions, ratings
-
 def analyze_sentiments(opinions):
     sentiments = []
     for opinion in opinions:
@@ -79,30 +52,6 @@ def analyze_sentiments(opinions):
             sentiment_label = 'Neutral'
         sentiments.append((opinion, sentiment_label, sentiment_score))
     return sentiments
-
-def summarize_with_textrank(opinions):
-    text = "\n".join(opinions)
-    parser = PlaintextParser.from_string(text, Tokenizer("spanish"))
-    summarizer = TextRankSummarizer()
-    summary_sentences = summarizer(parser.document, 5)
-
-    summary = " ".join([str(sentence) for sentence in summary_sentences])
-    summary = re.sub(r'\s+', ' ', summary).strip()
-
-    if len(summary) > 200:
-        last_space = summary[:150].rfind(' ')
-        summary = summary[:last_space] + '.'
-
-    return summary
-
-def calculate_rating_change(ratings):
-    if len(ratings) < 2:
-        return 0  
-    current_avg = sum(ratings[-5:]) / len(ratings[-5:])
-    previous_avg = sum(ratings[:-5]) / len(ratings[:-5]) if len(ratings) > 5 else sum(ratings) / len(ratings)
-    change = current_avg - previous_avg
-    return round(change, 1)
-
 
 def rank_products_by_individual(sentiments, products):
     product_rankings = []
@@ -134,8 +83,6 @@ def rank_products_by_individual(sentiments, products):
     product_rankings.sort(key=lambda x: x.average_score, reverse=True)
     
     return product_rankings
-
-
 
 
 @views.get("/api/opinions/{busqueda}")
