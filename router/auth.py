@@ -7,7 +7,7 @@ from schemas.user_schema import fromDictToModel
 
 auth = APIRouter()
 
-@auth.post("/login")
+@auth.post("/login", tags=["auth"])
 async def login(user: UserAuth):
     result = get_collection("Users").find_one({"email": user.email})
     if result is None:
@@ -29,7 +29,7 @@ async def login(user: UserAuth):
             )
     
 
-@auth.post("/register")
+@auth.post("/register", tags=["auth"])
 def register(user: dict):
     userNew = fromDictToModel(user)
     result = get_collection("Users").find_one({"email": userNew.email})

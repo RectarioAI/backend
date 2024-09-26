@@ -17,6 +17,6 @@ def get_url_products(busqueda: str):
         if enlace and enlace.get('href'):
             hrefs.append(enlace['href'])
 
-    hrefs = hrefs[:4]
+    hrefs = hrefs[:3]
 
     return hrefs

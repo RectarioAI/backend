@@ -1,13 +1,8 @@
 from fastapi import APIRouter
 import re
 from fastapi.responses import JSONResponse
-import requests
-from bs4 import BeautifulSoup
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 import nltk
-from sumy.parsers.plaintext import PlaintextParser
-from sumy.nlp.tokenizers import Tokenizer
-from sumy.summarizers.text_rank import TextRankSummarizer
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 import time
@@ -85,8 +80,8 @@ def rank_products_by_individual(sentiments, products):
     return product_rankings
 
 
-@views.get("/api/opinions/{busqueda}")
-async def get_car_opinions(busqueda: str):
+@views.get("/api/opinions/{busqueda}", tags=["opinions"])
+async def get_opinions(busqueda: str):
     urls: list[str] = get_url_products(busqueda)
 
     total_sentiments = []
